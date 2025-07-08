@@ -19,7 +19,9 @@ app.get("/clean-whatsapp-field", async (req, res) => {
     if (!invoice) return res.status(404).send("❌ Смарт-счёт не найден");
 
     const currentValue = invoice.UF_CRM_SMART_INVOICE_1729361040;
-    if (!currentValue) return res.send("ℹ️ Поле WhatsApp пустое");
+    if (!currentValue || !/\s/.test(currentValue)) {
+      return res.send("ℹ️ Поле WhatsApp уже очищено или пустое");
+    }
 
     const cleanedValue = currentValue.replace(/\s/g, "");
 
@@ -31,9 +33,9 @@ app.get("/clean-whatsapp-field", async (req, res) => {
       },
     });
 
-    res.send(`✅ Удалены пробелы: <br>${cleanedValue}`);
+    res.send(`✅ Удалены пробелы: ${cleanedValue}`);
   } catch (err) {
-    console.error("❌ Ошибка:", err?.response?.data || err.message);
+    console.error("❌ Ошибка при обращении к Bitrix24:", err?.response?.data || err.message);
     res.status(500).send("❌ Ошибка сервера");
   }
 });
